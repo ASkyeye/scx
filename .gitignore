@@ -1,0 +1,6 @@
+result/*
+Test/*
+*.pyc
+__pycache__/*
+*.bin
+*.exe
