@@ -1,5 +1,6 @@
 import struct, shutil, io
 from lib import logger
+
 # Shamelessly lifted from: https://github.com/secretsquirrel/SigThief/blob/master/sigthief.py
 
 def gather_file_info_win(binary):
