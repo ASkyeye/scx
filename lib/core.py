@@ -37,7 +37,7 @@ class Scx:
             self.name = 'scx'
 
         self.outfile_c = './result/%s_%s.c' % (self.name, self.arch)
-        self.outfile_cs = './result/%s._%scs' % (self.name, self.arch)
+        self.outfile_cs = './result/%s_%s.cs' % (self.name, self.arch)
         self.outfile_net_exe = './result/%s_%s.exe' % (self.name, self.arch)
         self.outfile_exe = './result/%s_%s.exe' % (self.name, self.arch)
         self.outfile_signed_exe = './result/%s_signed_%s.exe' % (self.name, self.arch)
@@ -64,42 +64,36 @@ class Scx:
         compiler_command = ''
 
         if self.lang == 'cs':
-            print('Compiling with Mono')
-            if self.arch == 'x86':
-                compiler_command = 'mono x86'
-            elif self.arch == 'x64':
-                compiler_command = 'mono x64'
-            else:
-                return False
+            compiler_command = 'mcs /platform:%s /unsafe %s /out:%s' % (self.arch, self.outfile_cs, self.outfile_net_exe)
 
-        elif self.lang == 'cpp':
+        elif self.lang == 'c':
             if self.arch == 'x86':
                 compiler_command = 'i686-w64-mingw32-gcc %s -o %s' % (self.outfile_c, self.outfile_exe)
             elif self.arch == 'x64':
                 compiler_command = 'x86_64-w64-mingw32-gcc %s -o %s' % (self.outfile_c, self.outfile_exe)
             else:
                 return False
-            logger.msg('Compiling with: ', compiler_command, 'blue')
-            if os.system(compiler_command) == 0:
-                if os.path.exists(self.outfile_exe):
-                    logger.msg('Compiled: ',self.outfile_exe, 'green')
-                    return True
-                else:
-                    logger.msg('Failed to compile: ',self.outfile_exe, 'red')
-                    return False
+
+        logger.msg('Compiling with: ', compiler_command, 'blue')
+
+        if os.system(compiler_command) == 0:
+            if os.path.exists(self.outfile_exe):
+                logger.msg('Compiled: ',self.outfile_exe, 'green')
+                return True
             else:
                 logger.msg('Failed to compile: ',self.outfile_exe, 'red')
                 return False
-
-        elif self.lang == 'ps':
-            compiler_command = ''
         else:
-            print('no.')
+            logger.msg('Failed to compile: ',self.outfile_exe, 'red')
+            return False
 
     def replace_variables(self,code, payload, key):
-        code = code.replace('$SHELLCODE$',payload)
-        code = code.replace('$KEY$',key)
+        namespace = utils.random_string()
 
+        code = code.replace('$Payload$',payload)
+        code = code.replace('$Key$',key)
+
+        # C
         code = code.replace('$VirtualProtectDec$', utils.random_string())
         code = code.replace('$VirtualAllocDec$', utils.random_string())
         code = code.replace('$RtlMoveMemoryDec$', utils.random_string())
@@ -110,24 +104,33 @@ class Scx:
 
         code = code.replace('$EncryptedShellcodeVar$',utils.random_string())
         code = code.replace('$ShellcodeVar$',utils.random_string())
+
+        # CS
+        code = code.replace('$Namespace$', utils.random_string())
+        code = code.replace('$EncryptedBase64Var$', utils.random_string())
+        code = code.replace('$DecryptedShellcode$', utils.random_string())
+        code = code.replace('$DecryptFunc$', utils.random_string())
+        code = code.replace('$RunShellcodeFunc$', utils.random_string())
+        code = code.replace('$PtrVar$', utils.random_string())
+        code = code.replace('$DelegateDec$', utils.random_string())
         return code
 
-    def cpp(self):
+
+    def c(self):
         xord = self.crypto.xor(self.file_bytes, self.key)
-        cpp = open(self.c_template, "rb").read().decode('utf-8')
-        cpp = self.replace_variables(cpp, xord, self.key)
-        self.code = cpp
+        c = open(self.c_template, "rb").read().decode('utf-8')
+        c = self.replace_variables(c, xord, self.key)
+        self.code = c
         with open(self.outfile_c,'w') as f:
             f.write(self.code)
 
     def cs(self):
         b64 = self.crypto.aes()
-        if self.randomise:
-            code = 'Console.WriteLine("Randomized: $%s$");' % b64
-        else:
-            code = 'Console.WriteLine("Hello $TEST$");'
-            code = self.replace_variables(code)
-        self.code = code
+        cs = open(self.cs_template, "rb").read().decode('utf-8')
+        cs = self.replace_variables(cs,b64,self.key)
+        self.code = cs
+        with open(self.outfile_cs,'w') as f:
+            f.write(self.code)
 
     def ps(self):
         b64 = self.crypto.aes()

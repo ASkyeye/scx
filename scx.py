@@ -3,7 +3,7 @@ from lib import logger, core
 import argparse
 
 parser = argparse.ArgumentParser(description="Build XOR'd shellcode executables.")
-parser.add_argument("-l", "--language", metavar="", required=True, help="Language for payload (cpp, cs and powershell)")
+parser.add_argument("-l", "--language", metavar="", required=True, help="Language for payload (c, cs and powershell)")
 parser.add_argument("-b", "--binary", metavar="", required=True, help="Raw file to encrypt")
 parser.add_argument("-k", "--key", metavar="", help="Key to encrypt with (random by default)")
 parser.add_argument("-n", "--name", metavar="", help="Name of executable (random by xor_beacon_*.exe)")
@@ -37,8 +37,8 @@ scx = core.Scx(lang,arch,key,file_bytes,name)
 logger.msg('Architecture: ', scx.arch, 'blue')
 logger.msg('Key: ', scx.key, 'blue')
 
-if lang == 'cpp':
-    scx.cpp()
+if lang == 'c':
+    scx.c()
 
 elif lang == 'cs':
     scx.cs()

