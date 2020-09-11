@@ -115,7 +115,6 @@ class Scx:
         code = code.replace('$DelegateDec$', utils.random_string())
         return code
 
-
     def c(self):
         xord = self.crypto.xor(self.file_bytes, self.key)
         c = open(self.c_template, "rb").read().decode('utf-8')

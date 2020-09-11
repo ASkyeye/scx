@@ -1,8 +1,18 @@
 #!/usr/bin/python3
 from lib import logger, core
-import argparse
+import argparse, os
 
-parser = argparse.ArgumentParser(description="Build XOR'd shellcode executables.")
+example_text = '''Example:
+
+python3 scx.py -l c -b payload.bin --sign --strip
+python3 scx.py -l c -b payload_x64.bin --sign --strip --x64
+'''
+
+parser = argparse.ArgumentParser(prog='scx',
+                                 description='Convert raw binaries to encrypted shellcode',
+                                 epilog=example_text,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+
 parser.add_argument("-l", "--language", metavar="", required=True, help="Language for payload (c, cs and powershell)")
 parser.add_argument("-b", "--binary", metavar="", required=True, help="Raw file to encrypt")
 parser.add_argument("-k", "--key", metavar="", help="Key to encrypt with (random by default)")
@@ -32,6 +42,17 @@ except Exception as e:
     logger.msg('Error opening file: ',e,'red')
     quit()
 
+if not os.path.exists('./result/'):
+    os.makedirs('./result')
+
+prereqs = ['i686-w64-mingw32-gcc', 'x86_64-w64-mingw32-gcc', 'mcs']
+
+for p in prereqs:
+    r = os.system(p + ' > /dev/null 2>&1')
+    if r != 256:
+        logger.msg('Missing requirement: ',p,'red')
+        quit()
+
 scx = core.Scx(lang,arch,key,file_bytes,name)
 
 logger.msg('Architecture: ', scx.arch, 'blue')
@@ -41,10 +62,12 @@ if lang == 'c':
     scx.c()
 
 elif lang == 'cs':
-    scx.cs()
+    logger.msg('Todo!',None,'blue')
+    quit()
 
 elif lang == 'ps':
-    scx.ps()
+    logger.msg('Todo!',None,'blue')
+    quit()
 
 else:
     quit()
