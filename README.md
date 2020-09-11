@@ -1,5 +1,7 @@
 # SCX
 
+Convert raw binary files to XOR'd shellcode and embed into a C template. This template is then compiled with the opportunity to `strip` and `sign` the file. See the details section further down!
+
 ## Help
 ```
 usage: scx.py [-h] -l  -b  [-k] [-n] [--x64] [--sign] [--strip]
